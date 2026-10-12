@@ -1,0 +1,9 @@
+START HERE
+==========
+1. Copy this BRIS folder to C:\xampp\htdocs\
+2. Start Apache and MySQL in XAMPP.
+3. Import database/bris.sql in http://localhost/phpmyadmin/
+4. Visit http://localhost/BRIS/
+5. If needed, edit config/database.php for your MySQL credentials.
+
+Read README.txt for full installation steps and project limitations.

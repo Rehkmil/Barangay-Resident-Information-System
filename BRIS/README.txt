@@ -1,24 +1,78 @@
-BRIS XAMPP PROJECT
+BRIS - BARANGAY RESIDENT INFORMATION SYSTEM
+==========================================
 
-INSTALLATION
-1. Extract the BRIS folder to C:\xampp\htdocs\ so the file path is C:\xampp\htdocs\BRIS\index.php
-2. Open XAMPP Control Panel and start Apache and MySQL.
-3. Open http://localhost/phpmyadmin/
-4. Click Import, choose BRIS/database/bris.sql, then click Import/Go.
-5. Open http://localhost/BRIS/
+ABOUT
+-----
+This is a simplified PHP + MySQL project for XAMPP. It is organized as a fresh,
+student-friendly project and uses the supplied iNetTutor barangay system ZIP as a
+feature reference (resident records, households, officials/documents concepts,
+and reports). It does not bundle or directly reuse the legacy source code.
 
-PAGES
-- index.php: responsive landing page
-- resident_form.php: register or edit a resident
-- residents.php: search, filter by status, and edit residents
-- households.php: household list and member counts
-- reports.php: summary report with print support
+FEATURES INCLUDED
+-----------------
+- Responsive BRIS landing page
+- Resident registration and editing
+- Resident search and status filter
+- Household assignment and household summary
+- Printable resident report
+- PDO prepared statements for database queries
+- CSRF token check on resident save form
+- Sample records for demonstration
 
-DATABASE TABLES
-- residents
-- households
-- barangay_officials
-- resident_documents
+PROJECT STRUCTURE
+-----------------
+BRIS/
+  index.php                 Landing page
+  residents.php             Resident list, search, and status filter
+  resident_form.php         Add/edit resident form
+  resident_save.php         Validate and save resident information
+  households.php            Household list and member counts
+  reports.php               Printable resident report
+  config/
+    database.php            PDO database connection
+    functions.php           Shared helpers, navigation, flash messages, CSRF
+  assets/
+    style.css               Shared responsive styles
+  database/
+    bris.sql                Database tables and sample data
+  README.txt                This file
+  REFERENCE_NOTES.txt       Notes about the supplied reference archive
 
-Database connection settings are in config/database.php. A default XAMPP install commonly uses username root and a blank password.
-Sample resident data is fictional. This is a school-project starter, not production-ready software. Household add/edit and barangay official/document management are not yet implemented. Before real deployment, add authentication, roles, audit logs, backups, and appropriate privacy/security controls.
+INSTALLATION ON XAMPP
+---------------------
+1. Extract the ZIP file.
+2. Copy the BRIS folder to C:\xampp\htdocs\
+   Final path should be C:\xampp\htdocs\BRIS\index.php
+3. Open the XAMPP Control Panel.
+4. Start Apache and MySQL.
+5. Open http://localhost/phpmyadmin/
+6. Select Import, choose BRIS/database/bris.sql, then click Import/Go.
+   The SQL file creates the bris_db database and adds sample records.
+7. Open http://localhost/BRIS/
+
+DATABASE SETTINGS
+-----------------
+Default settings are in config/database.php:
+Host: localhost
+Database: bris_db
+Username: root
+Password: blank
+
+If your MySQL username or password is different, edit config/database.php.
+
+TROUBLESHOOTING
+---------------
+- If the page cannot connect to MySQL, confirm MySQL is running and the database
+  import succeeded.
+- If CSS is missing, make sure the folder name is BRIS and open the site using
+  http://localhost/BRIS/ rather than opening the PHP file directly.
+- If a column/table error appears, import the included database/bris.sql into
+  the same MySQL server used by config/database.php.
+
+IMPORTANT LIMITATIONS
+---------------------
+- This is a local/student demonstration project, not production-ready software.
+- No user login, role permissions, audit log, or production privacy controls are
+  included. Do not put real residents' personal data into a public deployment.
+- The sample residents and households are fictional.
+- Make a database backup before testing destructive changes.

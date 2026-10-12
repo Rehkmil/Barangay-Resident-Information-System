@@ -1,0 +1,21 @@
+BRIS XAMPP PROJECT — START HERE
+
+1. Extract the BRIS folder into C:\xampp\htdocs\
+2. Start Apache and MySQL in the XAMPP Control Panel.
+3. Open http://localhost/phpmyadmin/
+4. Import BRIS/database/bris.sql
+5. Open http://localhost/BRIS/
+6. Open http://localhost/BRIS/officials.php to view the unique officials directory.
+
+The officials page uses initials and placeholder names if the officials table is empty. Replace placeholders with authorized sample or real records only when appropriate.
+
+Main features:
+- Resident registration and profile management
+- Household management
+- Search and filter residents
+- Resident status tracking
+- Basic reports and printable records
+- Unique officials directory page with placeholder cards
+
+Database connection defaults to XAMPP's local MySQL user root with an empty password. Change config/database.php if your local setup differs.
+This is a student project starter, not production-ready software. Add authentication, role permissions, audit logs, backups, and privacy safeguards before using real resident data.

@@ -1,2 +1,73 @@
-<?php require 'config/functions.php';require 'config/database.php';$rows=$pdo->query('SELECT h.*,COUNT(r.id) member_count FROM households h LEFT JOIN residents r ON r.household_id=h.id GROUP BY h.id ORDER BY h.household_code')->fetchAll();start_page('Households'); ?>
-<div class="pagehead"><div class="wrap"><h1>Household Records</h1><p class="muted">Household records and their registered residents.</p></div></div><main class="wrap"><div class="panel"><p class="muted"><?=count($rows)?> household(s) recorded.</p><div class="tablewrap"><table><thead><tr><th>Household Code</th><th>Address</th><th>Head of Household</th><th>Members</th></tr></thead><tbody><?php if(!$rows):?><tr><td colspan="4">No households yet. Import the SQL file to load sample records.</td></tr><?php endif;foreach($rows as $r):?><tr><td><?=e($r['household_code'])?></td><td><?=e($r['address'])?></td><td><?=e($r['head_name']??'Not specified')?></td><td><?=$r['member_count']?></td></tr><?php endforeach;?></tbody></table></div><p class="muted">For this starter version, add or edit household records through phpMyAdmin.</p></div></main><?php end_page(); ?>
+<?php
+
+// Load shared helpers and the database connection.
+require_once 'config/functions.php';
+require_once 'config/database.php';
+
+// Get households and count residents in each household.
+$sql = "
+    SELECT
+        h.*,
+        COUNT(r.id) AS member_count
+    FROM households AS h
+    LEFT JOIN residents AS r ON r.household_id = h.id
+    GROUP BY h.id
+    ORDER BY h.household_code ASC
+";
+
+$households = $pdo->query($sql)->fetchAll();
+
+start_page('Households');
+?>
+
+<div class="pagehead">
+    <div class="wrap">
+        <h1>Household Records</h1>
+        <p class="muted">Household records and their registered residents.</p>
+    </div>
+</div>
+
+<main class="wrap">
+    <div class="panel">
+        <p class="muted">
+            <?= count($households) ?> household(s) recorded.
+        </p>
+
+        <div class="tablewrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Household Code</th>
+                        <th>Address</th>
+                        <th>Head of Household</th>
+                        <th>Members</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if (empty($households)): ?>
+                        <tr>
+                            <td colspan="4">
+                                No households found. Import the SQL file to load sample records.
+                            </td>
+                        </tr>
+                    <?php else: ?>
+                        <?php foreach ($households as $household): ?>
+                            <tr>
+                                <td><?= e($household['household_code']) ?></td>
+                                <td><?= e($household['address']) ?></td>
+                                <td><?= e($household['head_name'] ?? 'Not specified') ?></td>
+                                <td><?= (int) $household['member_count'] ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+
+        <p class="muted">
+            In this starter version, household records can be managed through phpMyAdmin.
+        </p>
+    </div>
+</main>
+
+<?php end_page(); ?>

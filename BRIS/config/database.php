@@ -1,10 +1,24 @@
 <?php
-$host = 'localhost'; $db = 'bris_db'; $user = 'root'; $pass = '';
+
+// Database settings for XAMPP.
+$host = 'localhost';
+$dbName = 'bris_db';
+$username = 'root';
+$password = '';
+
 try {
-  $pdo = new PDO("mysql:host=$host;dbname=$db;charset=utf8mb4", $user, $pass, [
-    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
-  ]);
-} catch (PDOException $e) {
-  exit('Database connection failed. Start MySQL in XAMPP and import database/bris.sql in phpMyAdmin.');
+    $pdo = new PDO(
+        "mysql:host={$host};dbname={$dbName};charset=utf8mb4",
+        $username,
+        $password,
+        [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+        ]
+    );
+} catch (PDOException $exception) {
+    exit(
+        'Database connection failed. Start MySQL in XAMPP and import ' .
+        'database/bris.sql using phpMyAdmin.'
+    );
 }

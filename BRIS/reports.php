@@ -1,7 +1,6 @@
 <?php
-
-// Load shared helpers and the database connection.
 require_once 'config/functions.php';
+require_role('staff');
 require_once 'config/database.php';
 
 // Collect report totals.

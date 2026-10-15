@@ -3,19 +3,24 @@ BRIS XAMPP PROJECT — START HERE
 1. Extract the BRIS folder into C:\xampp\htdocs\
 2. Start Apache and MySQL in the XAMPP Control Panel.
 3. Open http://localhost/phpmyadmin/
-4. Import BRIS/database/bris.sql
-5. Open http://localhost/BRIS/
-6. Open http://localhost/BRIS/officials.php to view the unique officials directory.
+4. Import BRIS/database/bris.sql (this also creates the users table). If you already have an older bris_db, import database/add_login_system.sql instead to add the users table without deleting resident data.
+5. Open http://localhost/BRIS/setup_staff.php and create the first staff account.
+   Choose your own username, email, and strong password. No default password is used.
+6. Log in at http://localhost/BRIS/login.php
+7. Users can create a standard account at http://localhost/BRIS/register.php.
+8. Staff can create additional staff/user accounts and optionally link a user to a resident record in Accounts.
 
-The officials page uses initials and placeholder names if the officials table is empty. Replace placeholders with authorized sample or real records only when appropriate.
+IMPORTANT SECURITY NOTES
+- The setup_staff.php page is available only until the first staff account exists. After setup, you can remove this file from the server for extra safety.
+- Staff-only pages require a staff login. Standard users cannot open resident management, household reports, or account management.
+- Log out using the Log out button in the navigation; logout is a POST action with CSRF protection.
+- This is a student project. Use sample data, not real resident information, unless the system has undergone a proper security and privacy review.
 
-Main features:
-- Resident registration and profile management
-- Household management
-- Search and filter residents
-- Resident status tracking
-- Basic reports and printable records
-- Unique officials directory page with placeholder cards
-
-Database connection defaults to XAMPP's local MySQL user root with an empty password. Change config/database.php if your local setup differs.
-This is a student project starter, not production-ready software. Add authentication, role permissions, audit logs, backups, and privacy safeguards before using real resident data.
+MAIN FEATURES
+- Resident registration, editing, search, and status filter (staff)
+- Household list and member counts (staff)
+- Basic reports and print (staff)
+- Officials directory (staff)
+- Login/logout for staff and user roles
+- User registration and staff account creation
+- Optional link between a user account and a resident profile

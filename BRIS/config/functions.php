@@ -1,17 +1,22 @@
 <?php
-
-// Start a session when one is not already active.
+// Configure safer session defaults before starting the session.
 if (session_status() !== PHP_SESSION_ACTIVE) {
+    ini_set('session.use_strict_mode', '1');
+    session_set_cookie_params([
+        'lifetime' => 0,
+        'path' => '/',
+        'secure' => !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off',
+        'httponly' => true,
+        'samesite' => 'Lax',
+    ]);
     session_start();
 }
 
-// Safely escape values before displaying them in HTML.
 function e($value)
 {
     return htmlspecialchars((string) ($value ?? ''), ENT_QUOTES, 'UTF-8');
 }
 
-// Create or return the current form security token.
 function token()
 {
     if (empty($_SESSION['csrf'])) {
@@ -21,24 +26,21 @@ function token()
     return $_SESSION['csrf'];
 }
 
-// Reject form submissions with an invalid security token.
 function verify_token()
 {
     $submittedToken = $_POST['csrf'] ?? '';
 
-    if (!hash_equals(token(), $submittedToken)) {
+    if (!is_string($submittedToken) || !hash_equals(token(), $submittedToken)) {
         http_response_code(403);
         exit('Invalid form token. Go back and try again.');
     }
 }
 
-// Store a message to show after a redirect.
 function flash($message, $type = 'success')
 {
     $_SESSION['flash'] = [$message, $type];
 }
 
-// Display and clear the saved message.
 function show_flash()
 {
     if (empty($_SESSION['flash'])) {
@@ -46,42 +48,104 @@ function show_flash()
     }
 
     [$message, $type] = $_SESSION['flash'];
+    $allowedTypes = ['success', 'danger'];
+    if (!in_array($type, $allowedTypes, true)) {
+        $type = 'success';
+    }
 
-    echo '<div class="alert ' . e($type) . '">';
-    echo e($message);
-    echo '</div>';
-
+    echo '<div class="alert ' . e($type) . '">' . e($message) . '</div>';
     unset($_SESSION['flash']);
 }
 
-// Display the shared site navigation.
+function current_user()
+{
+    return $_SESSION['auth_user'] ?? null;
+}
+
+function is_logged_in()
+{
+    $user = current_user();
+    return is_array($user) && !empty($user['id']) && in_array($user['role'] ?? '', ['staff', 'user'], true);
+}
+
+function require_login()
+{
+    if (is_logged_in()) {
+        return;
+    }
+
+    // Save only a local page name; do not accept an external redirect URL.
+    $requestedPage = basename($_SERVER['PHP_SELF'] ?? 'index.php');
+    $allowedPages = ['residents.php', 'resident_form.php', 'resident_save.php', 'households.php', 'reports.php', 'officials.php', 'accounts.php'];
+    if (in_array($requestedPage, $allowedPages, true)) {
+        $_SESSION['after_login'] = $requestedPage;
+    }
+
+    flash('Please log in to open that page.', 'danger');
+    header('Location: login.php');
+    exit;
+}
+
+function require_role($requiredRole)
+{
+    require_login();
+    $user = current_user();
+
+    if (($user['role'] ?? '') !== $requiredRole) {
+        flash('You do not have permission to open that page.', 'danger');
+        $destination = ($user['role'] ?? '') === 'staff' ? 'residents.php' : 'user_dashboard.php';
+        header('Location: ' . $destination);
+        exit;
+    }
+}
+
+function role_home($user = null)
+{
+    $user = $user ?? current_user();
+    return (($user['role'] ?? '') === 'staff') ? 'residents.php' : 'user_dashboard.php';
+}
+
 function nav()
 {
+    $user = current_user();
     ?>
     <header>
         <div class="wrap nav">
             <a class="brand" href="index.php">
                 <b>B</b>
-                <span>
-                    BRIS
-                    <small>Barangay Resident Information System</small>
-                </span>
+                <span>BRIS<small>Barangay Resident Information System</small></span>
             </a>
-
             <nav>
                 <a href="index.php">Home</a>
-                <a href="officials.php">Officials</a>
-                <a href="residents.php">Residents</a>
-                <a href="resident_form.php">Registration</a>
-                <a href="households.php">Households</a>
-                <a href="reports.php">Reports</a>
+                <?php if (is_logged_in() && ($user['role'] ?? '') === 'staff'): ?>
+                    <a href="residents.php">Residents</a>
+                    <a href="resident_form.php">Registration</a>
+                    <a href="households.php">Households</a>
+                    <a href="reports.php">Reports</a>
+                    <a href="officials.php">Officials</a>
+                    <a href="accounts.php">Accounts</a>
+                    <span class="nav-user">Staff: <?= e($user['username'] ?? '') ?></span>
+                    <form class="nav-logout" action="logout.php" method="post">
+                        <input type="hidden" name="csrf" value="<?= e(token()) ?>">
+                        <button type="submit" class="btn primary">Log out</button>
+                    </form>
+                <?php elseif (is_logged_in()): ?>
+                    <a href="user_dashboard.php">My Account</a>
+                    <span class="nav-user">User: <?= e($user['username'] ?? '') ?></span>
+                    <form class="nav-logout" action="logout.php" method="post">
+                        <input type="hidden" name="csrf" value="<?= e(token()) ?>">
+                        <button type="submit" class="btn primary">Log out</button>
+                    </form>
+                <?php else: ?>
+                    <a href="login.php">Log in</a>
+                    <a href="register.php">Create account</a>
+                <?php endif; ?>
             </nav>
         </div>
     </header>
     <?php
 }
 
-// Open the HTML page and include shared styles/navigation.
 function start_page($title)
 {
     ?>
@@ -95,17 +159,13 @@ function start_page($title)
     </head>
     <body>
     <?php
-
     nav();
 }
 
-// Close the page with the shared footer.
 function end_page()
 {
     ?>
-    <footer>
-        <div class="wrap">BRIS · Student project demonstration</div>
-    </footer>
+    <footer><div class="wrap">BRIS · Student project demonstration</div></footer>
     </body>
     </html>
     <?php

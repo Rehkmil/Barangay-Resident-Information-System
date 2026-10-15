@@ -16,6 +16,9 @@ FEATURES INCLUDED
 - Household assignment and household summary
 - Printable resident report
 - PDO prepared statements for database queries
+- Session-based login/logout with staff and user roles
+- Password hashing, CSRF checks, and protected staff pages
+- Staff account management and optional resident profile linking
 - CSRF token check on resident save form
 - Sample records for demonstration
 
@@ -26,6 +29,12 @@ BRIS/
   residents.php             Resident list, search, and status filter
   resident_form.php         Add/edit resident form
   resident_save.php         Validate and save resident information
+  login.php                 Login for staff and users
+  logout.php                Secure sign-out endpoint (POST)
+  register.php              Public standard-user registration
+  setup_staff.php           One-time initial staff setup
+  user_dashboard.php        User account and linked profile view
+  accounts.php              Staff-only account creation and listing
   households.php            Household list and member counts
   reports.php               Printable resident report
   config/
@@ -35,6 +44,7 @@ BRIS/
     style.css               Shared responsive styles
   database/
     bris.sql                Database tables and sample data
+    add_login_system.sql    Migration for an existing database
   README.txt                This file
   REFERENCE_NOTES.txt       Notes about the supplied reference archive
 
@@ -46,9 +56,10 @@ INSTALLATION ON XAMPP
 3. Open the XAMPP Control Panel.
 4. Start Apache and MySQL.
 5. Open http://localhost/phpmyadmin/
-6. Select Import, choose BRIS/database/bris.sql, then click Import/Go.
-   The SQL file creates the bris_db database and adds sample records.
-7. Open http://localhost/BRIS/
+6. Select Import, choose BRIS/database/bris.sql, then click Import/Go. The SQL creates bris_db, the tables, and sample records.
+7. If you already imported an older BRIS database, import BRIS/database/add_login_system.sql into that database to add the users table. This migration does not delete resident data.
+8. Open http://localhost/BRIS/setup_staff.php and create the first staff account using your own credentials.
+9. Open http://localhost/BRIS/login.php to log in. Standard users can create an account at http://localhost/BRIS/register.php. Staff can create more user/staff accounts in Accounts.
 
 DATABASE SETTINGS
 -----------------
@@ -72,7 +83,6 @@ TROUBLESHOOTING
 IMPORTANT LIMITATIONS
 ---------------------
 - This is a local/student demonstration project, not production-ready software.
-- No user login, role permissions, audit log, or production privacy controls are
-  included. Do not put real residents' personal data into a public deployment.
+- Authentication and basic role permissions are included, but the project still lacks a full audit log and production-grade privacy/security review. Do not put real residents' personal data into a public deployment.
 - The sample residents and households are fictional.
 - Make a database backup before testing destructive changes.

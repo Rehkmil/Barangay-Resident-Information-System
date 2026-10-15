@@ -1,5 +1,6 @@
 <?php
 require_once 'config/functions.php';
+require_role('staff');
 require_once 'config/database.php';
 
 // Placeholder officials are used until real barangay records are entered.

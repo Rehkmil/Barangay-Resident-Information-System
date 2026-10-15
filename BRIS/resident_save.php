@@ -1,6 +1,7 @@
 <?php
-// 1. Configuration
 require_once 'config/functions.php';
+require_role('staff');
+// 1. Configuration
 require_once 'config/database.php';
 
 // 2. Allow form submissions only
